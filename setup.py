@@ -7,7 +7,6 @@ setup(
     author='Phivos Stylianides',
     author_email='stphivos@gmail.com',
     url='https://github.com/stphivos/type-genius',
-    download_url='https://github.com/stphivos/type-genius/tarball/0.1',
     keywords=['type', 'parsing'],
     classifiers=[],
 )
