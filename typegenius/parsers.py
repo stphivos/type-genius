@@ -69,4 +69,4 @@ def get(val):
     elif is_date(val, out_res):
         return out_res[0]
     else:
-        return str(val)
+        return val
