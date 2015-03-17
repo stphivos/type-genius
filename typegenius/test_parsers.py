@@ -1,6 +1,5 @@
 import unittest
 from datetime import datetime
-
 from typegenius import parsers
 
 
