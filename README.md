@@ -1,0 +1,1 @@
+A library that can recognize and parse variables to the appropriate built-in type
