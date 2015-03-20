@@ -125,7 +125,7 @@ def is_date_rfc_2822(val, out_res=None):
         out_res.append(date)
 
         return True
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, IndexError):
         return False
 
 
@@ -157,7 +157,7 @@ def is_date_rfc_1123(val, out_res=None):
         out_res.append(date)
 
         return True
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, IndexError):
         return False
 
 
@@ -189,7 +189,7 @@ def is_date_rfc_850(val, out_res=None):
         out_res.append(date)
 
         return True
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, IndexError):
         return False
 
 
@@ -219,7 +219,7 @@ def is_date_ansi_c(val, out_res=None):
         out_res.append(date)
 
         return True
-    except (ValueError, AttributeError):
+    except (ValueError, AttributeError, IndexError):
         return False
 
 
