@@ -1,5 +1,5 @@
-from typegenius import localization, dates
-from typegenius.dates import DatePart
+from typegenius import localization, dates, util
+from typegenius.dates import DatePart, Month
 from datetime import datetime
 
 
@@ -51,20 +51,6 @@ def is_bool(val, out_res=None):
         return False
 
 
-def is_date_rfc_2822(val, out_res=None):
-    """
-    Format: Wed, 05 Oct 2011 22:26:12 -0400
-    """
-    pass
-
-
-def is_date_rfc_2616(val, out_res=None):
-    """
-    Format: Thu, 06 Oct 2011 02:26:12 GMT
-    """
-    pass
-
-
 def is_date_rfc_3339(val, out_res=None):
     """
     Format: 1997-07-16T19:20:30.45+01:00
@@ -99,7 +85,7 @@ def is_date_iso_8601(val, out_res=None):
         return False  # Requires at least the date
     if parts[DatePart.fraction] is not None and parts[DatePart.fraction] not in ['.', ',']:
         return False  # Allows comma or period for decimal fractions of time elements
-    if not parts[DatePart.zone_pos] and parts[DatePart.zone_h] == 0:
+    if not parts[DatePart.zone_sign] and parts[DatePart.zone_h] == 0:
         return False  # Does not allow -00:00
 
     if out_res is None:
@@ -111,13 +97,151 @@ def is_date_iso_8601(val, out_res=None):
     return True
 
 
+def is_date_rfc_2822(val, out_res=None):
+    """
+    Code:       RFC 2822
+    Format:     day-name, 2DIGIT month-name 4DIGIT 2DIGIT:2DIGIT:2DIGIT +|-4DIGIT
+    Example:    Wed, 05 Oct 2011 22:26:12 -0400
+    """
+    try:
+        lst = util.split(val, [' ', ',', ':'], remove_empty=True)
+
+        parts = {
+            DatePart.year: int(lst[3]),
+            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.day: int(lst[1]),
+            DatePart.day_nm: lst[0],
+            DatePart.hour: int(lst[4]),
+            DatePart.minute: int(lst[5]),
+            DatePart.second: int(lst[6]),
+            DatePart.zone_text: lst[7],
+            DatePart.zone_sign: False if lst[7][0] == '-' else True if lst[7][0] == '+' else None
+        }
+
+        if out_res is None:
+            out_res = []
+
+        date = dates.create_date(parts)
+        out_res.append(date)
+
+        return True
+    except (ValueError, AttributeError):
+        return False
+
+
+def is_date_rfc_1123(val, out_res=None):
+    """
+    Code:       RFC 1123
+    Format:     wkday, 2DIGIT month 4DIGIT 2DIGIT:2DIGIT:2DIGIT GMT
+    Example:    Sun, 06 Nov 1994 08:49:37 GMT
+    """
+    try:
+        lst = util.split(val, [' ', ',', ':'], remove_empty=True)
+
+        parts = {
+            DatePart.year: int(lst[3]),
+            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.day: int(lst[1]),
+            DatePart.day_nm: lst[0],
+            DatePart.hour: int(lst[4]),
+            DatePart.minute: int(lst[5]),
+            DatePart.second: int(lst[6]),
+            DatePart.zone_text: '+00:00',
+            DatePart.zone_sign: True
+        }
+
+        if out_res is None:
+            out_res = []
+
+        date = dates.create_date(parts)
+        out_res.append(date)
+
+        return True
+    except (ValueError, AttributeError):
+        return False
+
+
+def is_date_rfc_850(val, out_res=None):
+    """
+    Code:       RFC 850
+    Format:     weekday, 2DIGIT-month-2DIGIT 2DIGIT:2DIGIT:2DIGIT GMT
+    Example:    Sunday, 06-Nov-94 08:49:37 GMT
+    """
+    try:
+        lst = util.split(val, ['-', ',', ':', ' '], remove_empty=True)
+
+        parts = {
+            DatePart.year: int(lst[3]),
+            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.day: int(lst[1]),
+            DatePart.day_name: lst[0],
+            DatePart.hour: int(lst[4]),
+            DatePart.minute: int(lst[5]),
+            DatePart.second: int(lst[6]),
+            DatePart.zone_text: '+00:00',
+            DatePart.zone_sign: True
+        }
+
+        if out_res is None:
+            out_res = []
+
+        date = dates.create_date(parts)
+        out_res.append(date)
+
+        return True
+    except (ValueError, AttributeError):
+        return False
+
+
+def is_date_ansi_c(val, out_res=None):
+    """
+    Code:       ANSI C's asctime()
+    Format:     wkday month 1|2DIGIT 2DIGIT:2DIGIT:2DIGIT 4DIGIT
+    Example:    Sun Nov  6 08:49:37 1994
+    """
+    try:
+        lst = util.split(val, [' ', ',', ':'], remove_empty=True)
+
+        parts = {
+            DatePart.year: int(lst[6]),
+            DatePart.month: int(getattr(Month, lst[1]).value),
+            DatePart.day: int(lst[2]),
+            DatePart.day_nm: lst[0],
+            DatePart.hour: int(lst[3]),
+            DatePart.minute: int(lst[4]),
+            DatePart.second: int(lst[5])
+        }
+
+        if out_res is None:
+            out_res = []
+
+        date = dates.create_date(parts)
+        out_res.append(date)
+
+        return True
+    except (ValueError, AttributeError):
+        return False
+
+
+def is_date_rfc_2616(val, out_res=None):
+    """
+    Code: RFC 2616 (HTTP-date) = rfc1123-date | rfc850-date | asctime-date
+    """
+    is_valid = is_date_rfc_1123(val, out_res) or is_date_rfc_850(val, out_res) or is_date_ansi_c(val, out_res)
+    return is_valid
+
+
 def is_date(val, out_res=None):
     if out_res is None:
         out_res = []
+
     if isinstance(val, datetime):
         out_res.append(val)
         return True
-    elif is_date_rfc_3339(val, out_res):
+
+    val = dates.replace_zones(val)
+
+    if is_date_rfc_3339(val, out_res):
         return True
     elif is_date_iso_8601(val, out_res):
         return True
