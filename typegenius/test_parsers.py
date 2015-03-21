@@ -117,6 +117,11 @@ class TestParsers(unittest.TestCase):
         result = parsers.get(None)
         self.assertEqual(val, result)
 
+    def test_get_obj(self):
+        val = object()
+        result = parsers.get(val)
+        self.assertEqual(val, result)
+
     def test_get_float(self):
         val = 1.2
         result = parsers.get(str(val))
@@ -130,6 +135,16 @@ class TestParsers(unittest.TestCase):
     def test_get_bool(self):
         val = True
         result = parsers.get(str(val))
+        self.assertEqual(val, result)
+
+    def test_get_date_by_year_iso_8601(self):
+        val = datetime(2010, datetime.now().month, datetime.now().day)
+        result = parsers.get(val.strftime('%Y-%m-%d'))
+        self.assertEqual(val, result)
+
+    def test_get_date_by_year_month_iso_8601(self):
+        val = datetime(2010, 1, datetime.now().day)
+        result = parsers.get(val.strftime('%Y-%m-%d'))
         self.assertEqual(val, result)
 
     def test_get_date_by_year_month_day_iso_8601(self):

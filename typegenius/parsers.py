@@ -81,8 +81,8 @@ def is_date_iso_8601(val, out_res=None):
     """
     parts = dates.get_descending_parts(val)
 
-    if parts[DatePart.year] is None or parts[DatePart.month] is None or parts[DatePart.month] is None:
-        return False  # Requires at least the date
+    if parts[DatePart.year] is None:
+        return False  # Requires at least the year
     if parts[DatePart.fraction] is not None and parts[DatePart.fraction] not in ['.', ',']:
         return False  # Allows comma or period for decimal fractions of time elements
     if not parts[DatePart.zone_sign] and parts[DatePart.zone_h] == 0:
@@ -238,6 +238,9 @@ def is_date(val, out_res=None):
     if isinstance(val, datetime):
         out_res.append(val)
         return True
+
+    if not isinstance(val, str):
+        return False
 
     val = dates.replace_zones(val)
 

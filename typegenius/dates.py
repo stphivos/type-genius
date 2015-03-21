@@ -84,7 +84,7 @@ def create_date(parts):
     lst = [pad_year(parts[DatePart.year]) if parts[DatePart.year] <= 99 else str(parts[DatePart.year])]
     frm = '%Y'
     if parts[DatePart.month] is not None:
-        lst.append(str(parts[DatePart.month]).zfill(2))
+        lst.append(str(parts[DatePart.month] if parts[DatePart.month] is not None else datetime.now().month).zfill(2))
         frm += ' %m'
         if DatePart.day_nm in parts and parts[DatePart.day_nm] is not None:
             lst.append(parts[DatePart.day_nm])
@@ -92,8 +92,8 @@ def create_date(parts):
         elif DatePart.day_name in parts and parts[DatePart.day_name] is not None:
             lst.append(parts[DatePart.day_name])
             frm += ' %A'
-        if DatePart.day in parts and parts[DatePart.day] is not None:
-            lst.append(str(parts[DatePart.day]).zfill(2))
+        if DatePart.day in parts:
+            lst.append(str(parts[DatePart.day] if parts[DatePart.day] is not None else datetime.now().day).zfill(2))
             frm += ' %d'
             if DatePart.hour in parts and parts[DatePart.hour] is not None:
                 lst.append(str(parts[DatePart.hour]).zfill(2))
