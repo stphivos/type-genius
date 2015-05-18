@@ -1,6 +1,6 @@
 from typegenius import localization, dates, util
 from typegenius.dates import DatePart, Month
-from datetime import datetime
+from datetime import date, time, datetime
 
 
 def is_float(val, out_res=None):
@@ -67,8 +67,8 @@ def is_date_rfc_3339(val, out_res=None):
     if out_res is None:
         out_res = []
 
-    date = dates.create_date(parts)
-    out_res.append(date)
+    dt = dates.create_date(parts)
+    out_res.append(dt)
 
     return True
 
@@ -91,8 +91,8 @@ def is_date_iso_8601(val, out_res=None):
     if out_res is None:
         out_res = []
 
-    date = dates.create_date(parts)
-    out_res.append(date)
+    dt = dates.create_date(parts)
+    out_res.append(dt)
 
     return True
 
@@ -108,7 +108,7 @@ def is_date_rfc_2822(val, out_res=None):
 
         parts = {
             DatePart.year: int(lst[3]),
-            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.month: Month[lst[2]],
             DatePart.day: int(lst[1]),
             DatePart.day_nm: lst[0],
             DatePart.hour: int(lst[4]),
@@ -121,11 +121,11 @@ def is_date_rfc_2822(val, out_res=None):
         if out_res is None:
             out_res = []
 
-        date = dates.create_date(parts)
-        out_res.append(date)
+        dt = dates.create_date(parts)
+        out_res.append(dt)
 
         return True
-    except (ValueError, AttributeError, IndexError):
+    except (ValueError, AttributeError, IndexError, KeyError):
         return False
 
 
@@ -140,7 +140,7 @@ def is_date_rfc_1123(val, out_res=None):
 
         parts = {
             DatePart.year: int(lst[3]),
-            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.month: Month[lst[2]],
             DatePart.day: int(lst[1]),
             DatePart.day_nm: lst[0],
             DatePart.hour: int(lst[4]),
@@ -153,11 +153,11 @@ def is_date_rfc_1123(val, out_res=None):
         if out_res is None:
             out_res = []
 
-        date = dates.create_date(parts)
-        out_res.append(date)
+        dt = dates.create_date(parts)
+        out_res.append(dt)
 
         return True
-    except (ValueError, AttributeError, IndexError):
+    except (ValueError, AttributeError, IndexError, KeyError):
         return False
 
 
@@ -172,7 +172,7 @@ def is_date_rfc_850(val, out_res=None):
 
         parts = {
             DatePart.year: int(lst[3]),
-            DatePart.month: int(getattr(Month, lst[2]).value),
+            DatePart.month: Month[lst[2]],
             DatePart.day: int(lst[1]),
             DatePart.day_name: lst[0],
             DatePart.hour: int(lst[4]),
@@ -185,11 +185,11 @@ def is_date_rfc_850(val, out_res=None):
         if out_res is None:
             out_res = []
 
-        date = dates.create_date(parts)
-        out_res.append(date)
+        dt = dates.create_date(parts)
+        out_res.append(dt)
 
         return True
-    except (ValueError, AttributeError, IndexError):
+    except (ValueError, AttributeError, IndexError, KeyError):
         return False
 
 
@@ -204,7 +204,7 @@ def is_date_ansi_c(val, out_res=None):
 
         parts = {
             DatePart.year: int(lst[6]),
-            DatePart.month: int(getattr(Month, lst[1]).value),
+            DatePart.month: Month[lst[1]],
             DatePart.day: int(lst[2]),
             DatePart.day_nm: lst[0],
             DatePart.hour: int(lst[3]),
@@ -215,11 +215,11 @@ def is_date_ansi_c(val, out_res=None):
         if out_res is None:
             out_res = []
 
-        date = dates.create_date(parts)
-        out_res.append(date)
+        dt = dates.create_date(parts)
+        out_res.append(dt)
 
         return True
-    except (ValueError, AttributeError, IndexError):
+    except (ValueError, AttributeError, IndexError, KeyError):
         return False
 
 
@@ -263,6 +263,10 @@ def get_default(target):
         return 0
     elif target is bool:
         return False
+    elif target is date:
+        return date.min
+    elif target is time:
+        return time.min
     elif target is datetime:
         return datetime.min
     elif target is str:

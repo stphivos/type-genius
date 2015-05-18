@@ -1,60 +1,76 @@
-from enum import Enum
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
 from typegenius import localization, util
 
 
-class Month(Enum):
-    Jan = 1
-    Feb = 2
-    Mar = 3
-    Apr = 4
-    May = 5
-    Jun = 6
-    Jul = 7
-    Aug = 8
-    Sep = 9
-    Oct = 10
-    Nov = 11
-    Dec = 12
+class FixedOffset(tzinfo):
+    def __init__(self, offset):
+        tzinfo.__init__(self)
+        sign = str(offset)[0]
+        hrs = int(str(offset)[1:3])
+        mins = int(str(offset)[3:5])
+        delta = (mins + (hrs * 60)) * (-1 if sign == '-' else 1)
+        self.__offset = timedelta(minutes=delta)
+
+    def utcoffset(self, dt=None):
+        return self.__offset
 
 
-class Wkday(Enum):
-    Mon = 1
-    Tue = 2
-    Wed = 3
-    Thu = 4
-    Fri = 5
-    Sat = 6
-    Sun = 7
+class Enum(dict):
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
 
 
-class Weekday(Enum):
-    Monday = 1
-    Tuesday = 2
-    Wednesday = 3
-    Thursday = 4
-    Friday = 5
-    Saturday = 6
-    Sunday = 7
+Month = Enum(
+    Jan=1,
+    Feb=2,
+    Mar=3,
+    Apr=4,
+    May=5,
+    Jun=6,
+    Jul=7,
+    Aug=8,
+    Sep=9,
+    Oct=10,
+    Nov=11,
+    Dec=12
+)
 
+Wkday = Enum(
+    Mon=1,
+    Tue=2,
+    Wed=3,
+    Thu=4,
+    Fri=5,
+    Sat=6,
+    Sun=7
+)
 
-class DatePart(Enum):
-    year = 1
-    month = 2
-    day = 3
-    day_nm = 4
-    day_name = 5
+Weekday = Enum(
+    Monday=1,
+    Tuesday=2,
+    Wednesday=3,
+    Thursday=4,
+    Friday=5,
+    Saturday=6,
+    Sunday=7
+)
 
-    t = 6
-    hour = 7
-    minute = 8
-    second = 9
-    fraction = 10
-
-    zone_text = 11
-    zone_sign = 12
-    zone_h = 13
-    zone_m = 14
+DatePart = Enum(
+    year=1,
+    month=2,
+    day=3,
+    day_nm=4,
+    day_name=5,
+    t=6,
+    hour=7,
+    minute=8,
+    second=9,
+    fraction=10,
+    zone_text=11,
+    zone_sign=12,
+    zone_h=13,
+    zone_m=14
+)
 
 
 def pad_year(year):
@@ -65,17 +81,17 @@ def pad_year(year):
 
 
 def replace_zones(val):
-    res = val\
-        .replace('Z', '+00:00')\
-        .replace('GMT', '+00:00')\
-        .replace('UTC', '+00:00')\
-        .replace('EST', '-05:00')\
-        .replace('EDT', '-04:00')\
-        .replace('CST', '-06:00')\
-        .replace('CDT', '-05:00')\
-        .replace('MST', '-07:00')\
-        .replace('MDT', '-06:00')\
-        .replace('PST', '-08:00')\
+    res = val \
+        .replace('Z', '+00:00') \
+        .replace('GMT', '+00:00') \
+        .replace('UTC', '+00:00') \
+        .replace('EST', '-05:00') \
+        .replace('EDT', '-04:00') \
+        .replace('CST', '-06:00') \
+        .replace('CDT', '-05:00') \
+        .replace('MST', '-07:00') \
+        .replace('MDT', '-06:00') \
+        .replace('PST', '-08:00') \
         .replace('PDT', '-07:00')
     return res
 
@@ -108,10 +124,9 @@ def create_date(parts):
                         else:
                             lst.append(str(int(parts[DatePart.second])).zfill(2))
                             frm += ' %S'
-                        if DatePart.zone_sign in parts and parts[DatePart.zone_sign] is not None:
-                            lst.append(parts[DatePart.zone_text].replace(':', ''))
-                            frm += ' %z'
     res = datetime.strptime(' '.join(lst), frm)
+    if DatePart.zone_sign in parts and parts[DatePart.zone_sign] is not None:
+        res = res.replace(tzinfo=FixedOffset(parts[DatePart.zone_text].replace(':', '')))
     return res
 
 

@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime
 from typegenius import parsers
+from typegenius.dates import FixedOffset
 
 
 class TestParsers(unittest.TestCase):
@@ -163,27 +164,30 @@ class TestParsers(unittest.TestCase):
         self.assertEqual(val, result)
 
     def test_get_date_with_z_3339_8601(self):
-        val = datetime.strptime('2015-03-16T13:29:14.50+0000', '%Y-%m-%dT%H:%M:%S.%f%z')
+        val = datetime.strptime('2015-03-16T13:29:14.50', '%Y-%m-%dT%H:%M:%S.%f').replace(tzinfo=FixedOffset('+0000'))
         result = parsers.get('2015-03-16T13:29:14.50Z')
         self.assertEqual(val, result)
 
     def test_get_date_with_timezone_3339_8601(self):
-        val = datetime.strptime('2015-03-16T13:29:14.550+0200', '%Y-%m-%dT%H:%M:%S.%f%z')
+        val = datetime.strptime('2015-03-16T13:29:14.550', '%Y-%m-%dT%H:%M:%S.%f').replace(tzinfo=FixedOffset('+0200'))
         result = parsers.get('2015-03-16T13:29:14.550+02:00')
         self.assertEqual(val, result)
 
     def test_get_date_rfc_2822(self):
-        val = datetime.strptime('Wed, 05 Oct 2011 22:26:12 -0400', '%a, %d %b %Y %H:%M:%S %z')
+        val = datetime.strptime('Wed, 05 Oct 2011 22:26:12', '%a, %d %b %Y %H:%M:%S').replace(
+            tzinfo=FixedOffset('-0400'))
         result = parsers.get('Wed, 05 Oct 2011 22:26:12 -0400')
         self.assertEqual(val, result)
 
     def test_get_date_rfc_1123(self):
-        val = datetime.strptime('Sun, 06 Nov 1994 08:49:37 +0000', '%a, %d %b %Y %H:%M:%S %z')
+        val = datetime.strptime('Sun, 06 Nov 1994 08:49:37', '%a, %d %b %Y %H:%M:%S').replace(
+            tzinfo=FixedOffset('+0000'))
         result = parsers.get('Sun, 06 Nov 1994 08:49:37 GMT')
         self.assertEqual(val, result)
 
     def test_get_date_rfc_850(self):
-        val = datetime.strptime('Sunday, 06-Nov-94 08:49:37 +0000', '%A, %d-%b-%y %H:%M:%S %z')
+        val = datetime.strptime('Sunday, 06-Nov-94 08:49:37', '%A, %d-%b-%y %H:%M:%S').replace(
+            tzinfo=FixedOffset('+0000'))
         result = parsers.get('Sunday, 06-Nov-94 08:49:37 GMT')
         self.assertEqual(val, result)
 
