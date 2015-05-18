@@ -256,10 +256,25 @@ def is_date(val, out_res=None):
         return False
 
 
-def get(val):
+def get_default(target):
+    if target is float:
+        return 0.0
+    elif target is int:
+        return 0
+    elif target is bool:
+        return False
+    elif target is datetime:
+        return datetime.min
+    elif target is str:
+        return ''
+    elif target is None:
+        return None
+
+
+def get(val, target=None):
     out_res = []
     if val is None:
-        return None
+        return get_default(target)
     elif is_float(val, out_res):
         return out_res[0]
     elif is_int(val, out_res):
