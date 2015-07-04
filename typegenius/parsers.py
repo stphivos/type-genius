@@ -45,7 +45,7 @@ def is_bool(val, out_res=None):
         out_res.append(val)
         return True
     elif str(val).lower() in ['true', 'false']:
-        out_res.append(bool(val))
+        out_res.append(val == 'true')
         return True
     else:
         return False
