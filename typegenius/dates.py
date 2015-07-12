@@ -148,7 +148,7 @@ def get_descending_parts(val):
 
     dc = localization.get_decimal_separator()
     date_time_zone_parts = util.split(val, [' ', 'T'])
-    date_parts = util.split(date_time_zone_parts[0], ['-'])
+    date_parts = util.split(date_time_zone_parts[0], ['-', '/'])
     time_zone_parts = time_parts = zone_parts = []
 
     if len(date_time_zone_parts) > 1:
@@ -158,11 +158,13 @@ def get_descending_parts(val):
         zone_parts = util.split(date_time_zone_parts[1][index_list[0]:], [':']) if len(index_list) > 0 else []
 
     # Date
+    if len(date_parts) > 1 and len(date_parts[0]) == 2 and len(date_parts[1]) == 4:
+        date_parts[0], date_parts[1] = date_parts[1], date_parts[0]
     if len(date_parts) > 0 and date_parts[0].isdigit() and len(date_parts[0]) == 4:
         res[DatePart.year] = int(date_parts[0])
-    if len(date_parts) > 1 and date_parts[1].isdigit():
+    if len(date_parts) > 1 and date_parts[1].isdigit() and len(date_parts[1]) == 2:
         res[DatePart.month] = int(date_parts[1])
-    if len(date_parts) > 2 and date_parts[2].isdigit():
+    if len(date_parts) > 2 and date_parts[2].isdigit() and len(date_parts[2]) == 2:
         res[DatePart.day] = int(date_parts[2])
 
     # Time

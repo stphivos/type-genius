@@ -69,9 +69,17 @@ class TestParsers(unittest.TestCase):
         val = '2011-10-05'
         self.assertTrue(parsers.is_date_iso_8601(val))
 
-    def test_is_date_iso_8601_requires_at_least_date(self):
-        val = '12'
-        self.assertFalse(parsers.is_date_iso_8601(val))
+    def test_is_date_iso_8601_allows_year_only(self):
+        val = '2011'
+        self.assertTrue(parsers.is_date_iso_8601(val))
+
+    def test_is_date_iso_8601_allows_year_month_only(self):
+        val = '2011-10'
+        self.assertTrue(parsers.is_date_iso_8601(val))
+
+    def test_is_date_iso_8601_allows_year_month_only_reversed(self):
+        val = '10-2011'
+        self.assertTrue(parsers.is_date_iso_8601(val))
 
     def test_is_date_iso_8601_allows_period_comma_fractions(self):
         val = '2011-10-05T22:26:12,123+04:00'

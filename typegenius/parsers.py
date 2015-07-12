@@ -14,7 +14,7 @@ def is_float(val, out_res=None):
     dc = localization.get_decimal_separator()
     ts = localization.get_thou_separator()
 
-    if dc in str(val) and str(val).replace(dc, '').replace(ts, '').isdigit():
+    if dc in val and val.replace(dc, '').replace(ts, '').isdigit():
         out_res.append(float(val))
         return True
     else:
@@ -31,7 +31,7 @@ def is_int(val, out_res=None):
 
     ts = localization.get_thou_separator()
 
-    if str(val).replace(ts, '').isdigit():
+    if val.replace(ts, '').isdigit():
         out_res.append(int(val))
         return True
     else:
@@ -41,11 +41,12 @@ def is_int(val, out_res=None):
 def is_bool(val, out_res=None):
     if out_res is None:
         out_res = []
+
     if isinstance(val, bool):
         out_res.append(val)
         return True
-    elif str(val).lower() in ['true', 'false']:
-        out_res.append(val == 'true')
+    elif val.lower() in ['true', 'false']:
+        out_res.append(val.lower() == 'true')
         return True
     else:
         return False
@@ -239,9 +240,6 @@ def is_date(val, out_res=None):
         out_res.append(val)
         return True
 
-    if not isinstance(val, str):
-        return False
-
     val = dates.replace_zones(val)
 
     if is_date_rfc_3339(val, out_res):
@@ -277,15 +275,21 @@ def get_default(target):
 
 def get(val, target=None):
     out_res = []
+
     if val is None:
         return get_default(target)
-    elif is_float(val, out_res):
-        return out_res[0]
-    elif is_int(val, out_res):
-        return out_res[0]
-    elif is_bool(val, out_res):
-        return out_res[0]
-    elif is_date(val, out_res):
-        return out_res[0]
+
+    if isinstance(val, unicode) or isinstance(val, bytes):
+        val = str(val)
+
+    if isinstance(val, str):
+        if is_float(val, out_res):
+            return out_res[0]
+        elif is_int(val, out_res):
+            return out_res[0]
+        elif is_bool(val, out_res):
+            return out_res[0]
+        elif is_date(val, out_res):
+            return out_res[0]
     else:
         return val
