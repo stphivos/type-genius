@@ -45,8 +45,8 @@ def is_bool(val, out_res=None):
     if isinstance(val, bool):
         out_res.append(val)
         return True
-    elif val.lower() in ['true', 'false']:
-        out_res.append(val.lower() == 'true')
+    elif val.lower() in ['true', 'false', 'on', 'off']:
+        out_res.append(val.lower() in ['true', 'on'])
         return True
     else:
         return False
@@ -291,5 +291,5 @@ def get(val, target=None):
             return out_res[0]
         elif is_date(val, out_res):
             return out_res[0]
-    else:
-        return val
+
+    return val
