@@ -14,7 +14,7 @@ def is_float(val, out_res=None):
     dc = localization.get_decimal_separator()
     ts = localization.get_thou_separator()
 
-    if dc in val and val.replace(dc, '').replace(ts, '').isdigit():
+    if dc in val and val.count(dc) == 1 and val.replace(dc, '').replace(ts, '').isdigit():
         out_res.append(float(val))
         return True
     else:
