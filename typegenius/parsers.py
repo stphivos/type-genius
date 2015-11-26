@@ -279,8 +279,8 @@ def get(val, target=None):
     if val is None:
         return get_default(target)
 
-    if isinstance(val, unicode) or isinstance(val, bytes):
-        val = str(val)
+    if type(val) in ['unicode', 'bytes']:
+        val = val.decode()
 
     if isinstance(val, str):
         if is_float(val, out_res):
